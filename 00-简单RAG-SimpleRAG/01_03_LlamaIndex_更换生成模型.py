@@ -13,14 +13,15 @@ Settings.embed_model = HuggingFaceEmbedding("BAAI/bge-small-zh")
 # 加载环境变量
 from dotenv import load_dotenv
 import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"  # 禁用并行 tokenization
 
 # 加载 .env 文件中的环境变量
 load_dotenv()
 
 # 创建 Deepseek LLM（通过API调用最新的DeepSeek大模型）
 llm = DeepSeek(
-    model="deepseek-reasoner", # 使用最新的推理模型R1
-    api_key=os.getenv("DEEPSEEK_API_KEY")  # 从环境变量获取API key
+    model="deepseek-chat",
+    api_key=os.getenv("DEEPSEEK_API_KEY")
 )
 
 # 加载数据
@@ -38,4 +39,4 @@ query_engine = index.as_query_engine(
     )
 
 # 开始问答
-print(query_engine.query("黑神话悟空中有哪些战斗工具?"))
+print(query_engine.query("用中文回答 黑神话悟空中有哪些战斗工具?"))

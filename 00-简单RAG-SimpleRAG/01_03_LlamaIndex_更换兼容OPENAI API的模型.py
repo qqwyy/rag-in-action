@@ -1,18 +1,32 @@
 import os
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
-from llama_index.llms.openai import OpenAI  # 导入 OpenAI LLM 类
+from llama_index.core              import VectorStoreIndex, SimpleDirectoryReader, Settings
+from llama_index.llms.openai       import OpenAI  # 导入 OpenAI LLM 类
 from llama_index.embeddings.openai import OpenAIEmbedding # 导入 OpenAI Embedding 类
+
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
 
 # --- 开始配置你的自定义 API 地址和密钥 ---
 # 请将下面的 placeholder 替换为你的实际 API Base URL 和 API Key
-custom_api_base_url = "https://vip.apiyi.com/v1"  
-custom_api_key = "XXX"            # 例如: "sk-yourkeyvalue"
+# ; custom_api_base_url = "https://vip.apiyi.com/v1"
+custom_api_base_url = os.getenv("OPENAI_API_BASE") 
+custom_api_key      = os.getenv("OPENAI_API_KEY")
 
 # (可选) 确认你的第三方 API 支持并需要使用的模型名称
 
 # OpenAI 默认模型:
-llm_model_name = "gpt-4" # 或者你的 API 支持的其他聊天模型
-embedding_model_name = "text-embedding-ada-002" # 或者你的 API 支持的其他嵌入模型
+llm_model_name       = "gpt-3.5-turbo-0613" # 或者你的 API 支持的其他聊天模型
+embedding_model_name = "text-embedding-3-small" # 或者你的 API 支持的其他嵌入模型
+
+
+# 配置全局的 Embedding Model (用于文本向量化)
+Settings.embed_model = OpenAIEmbedding(
+    model=embedding_model_name,
+    api_key=custom_api_key,
+    api_base=custom_api_base_url,
+    # 有些 embedding 端点可能也接受额外参数
+)
+
 
 # 通过代码直接配置 (推荐，更清晰)
 # 配置全局的 LLM (用于问答生成)
@@ -24,13 +38,6 @@ Settings.llm = OpenAI(
     # 例如: temperature=0.7
 )
 
-# 配置全局的 Embedding Model (用于文本向量化)
-Settings.embed_model = OpenAIEmbedding(
-    model=embedding_model_name,
-    api_key=custom_api_key,
-    api_base=custom_api_base_url,
-    # 有些 embedding 端点可能也接受额外参数
-)
 
 # --- 配置结束 ---
 
@@ -65,3 +72,12 @@ print(f"\n正在查询: {question}")
 response = query_engine.query(question)
 print("\n回答:")
 print(response)
+
+
+# 打印组件信息
+print("===== 配置信息 =====")
+print(f"默认嵌入模型类型: {index._embed_model}")
+print(f"默认向量存储类型: {index.vector_store.class_name}")
+# print(f"默认向量db数据: {index._vector_store}")
+print(f"默认LLM模型: {Settings.llm}")
+# print(f"模型名称: {Settings}")
