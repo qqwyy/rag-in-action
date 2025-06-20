@@ -13,7 +13,7 @@ OPENAI_API_BASE     = os.getenv("OPENAI_API_BASE")
 print(f"请求的API为: {OPENAI_API_BASE}")
 
 
-# 第一行代码：导入相关的库
+# 第一行代码：导入相关的库  pip install llama-index
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader ,ServiceContext
 # 第二行代码：加载数据
 documents = SimpleDirectoryReader(input_files=["90-文档-Data/黑悟空/设定.txt"]).load_data() 
