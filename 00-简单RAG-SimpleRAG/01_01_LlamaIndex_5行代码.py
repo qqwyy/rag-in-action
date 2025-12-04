@@ -1,4 +1,5 @@
 """
+pip install python-dotenv -i https://pypi.tuna.tsinghua.edu.cn/simple/
 注意：运行此代码前，请确保已在环境变量中设置OpenAI API密钥。 
 在Linux/Mac系统中，可以通过以下命令设置： export OPENAI_API_KEY='sk-proxxxxxx'
 在Windows  系统中，可以通过以下命令设置： set OPENAI_API_KEY=your-api-key
@@ -13,7 +14,7 @@ OPENAI_API_BASE     = os.getenv("OPENAI_API_BASE")
 print(f"请求的API为: {OPENAI_API_BASE}")
 
 
-# 第一行代码：导入相关的库  pip install llama-index
+# 第一行代码：导入相关的库  pip install llama-index -i https://pypi.tuna.tsinghua.edu.cn/simple/
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader ,ServiceContext
 # 第二行代码：加载数据
 documents = SimpleDirectoryReader(input_files=["90-文档-Data/黑悟空/设定.txt"]).load_data() 

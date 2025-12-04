@@ -21,7 +21,7 @@
    - 在.env文件中添加:
      OLLAMA_MODEL=qwen:7b  # 或其他已下载的模型名称
 """
-
+# 参考wiki：https://docs.llamaindex.ai/en/stable/examples/llm/ollama/
 # 第一行代码：导入相关的库
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding

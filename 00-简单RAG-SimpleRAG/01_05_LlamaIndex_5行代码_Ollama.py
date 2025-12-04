@@ -35,6 +35,7 @@ load_dotenv()
 # 加载本地嵌入模型
 # embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-zh")
 
+# 参考wiki：https://docs.llamaindex.ai/en/stable/examples/llm/ollama/
 # 创建 Ollama LLM, 默认URL：http://localhost:11434
 llm = Ollama(
     model   =os.getenv("OLLAMA_MODEL"),
