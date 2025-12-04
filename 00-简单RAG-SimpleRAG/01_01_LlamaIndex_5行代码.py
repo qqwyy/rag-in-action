@@ -1,5 +1,5 @@
 """
-注意：运行此代码前，请确保已在环境变量中设置OpenAI API密钥。
+注意：运行此代码前，请确保已在环境变量中设置OpenAI API密钥。 
 在Linux/Mac系统中，可以通过以下命令设置： export OPENAI_API_KEY='sk-proxxxxxx'
 在Windows  系统中，可以通过以下命令设置： set OPENAI_API_KEY=your-api-key
 """
