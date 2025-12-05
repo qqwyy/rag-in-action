@@ -8,6 +8,11 @@ from langchain_community.document_loaders import WebBaseLoader
 
 loader = WebBaseLoader(
     web_paths=("https://zh.wikipedia.org/wiki/黑神话：悟空",)
+    ,requests_kwargs={
+        "headers": {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+    }
 )
 docs = loader.load()
 
@@ -53,9 +58,10 @@ prompt = ChatPromptTemplate.from_template("""
 # 8. 使用大语言模型生成答案
 from langchain_openai import ChatOpenAI
 
+
 llm = ChatOpenAI(
-    model="deepseek-reasoner",  # DeepSeek API 支持的模型名称
-    base_url="https://api.deepseek.com/v1",
+    model=os.getenv("DEEPSEEK_API_MODEL"),  # DeepSeek API 支持的模型名称
+    base_url=os.getenv("DEEPSEEK_API_BASE"), # 从环境变量加载API 请求地址
     temperature=0.7,        # 控制输出的随机性(0-1之间,越大越随机)
     max_tokens=2048,        # 最大输出长度
     top_p=0.95,            # 控制输出的多样性(0-1之间)

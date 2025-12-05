@@ -40,7 +40,7 @@ load_dotenv()
 llm = Ollama(
     model   =os.getenv("OLLAMA_MODEL"),
     base_url=os.getenv("OLLAMA_API_BASE"), 
-    request_timeout=30.0, 
+    request_timeout=30.0,
     context_window = 4000
 )
 

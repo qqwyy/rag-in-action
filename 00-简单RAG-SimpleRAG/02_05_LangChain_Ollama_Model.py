@@ -27,6 +27,11 @@ load_dotenv()
 from langchain_community.document_loaders import WebBaseLoader
 loader = WebBaseLoader(
     web_paths=("https://zh.wikipedia.org/wiki/黑神话：悟空",)
+    ,requests_kwargs={
+        "headers": {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+    }
 )
 docs = loader.load()
 

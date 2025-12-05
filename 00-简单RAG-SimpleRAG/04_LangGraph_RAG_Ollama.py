@@ -7,6 +7,11 @@ load_dotenv()
 from langchain_community.document_loaders import WebBaseLoader
 loader = WebBaseLoader(
     web_paths=("https://zh.wikipedia.org/wiki/黑神话：悟空",)
+    ,requests_kwargs={
+        "headers": {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+    }
 )
 docs = loader.load()
 
@@ -28,7 +33,7 @@ from langchain_core.vectorstores import InMemoryVectorStore
 vector_store = InMemoryVectorStore(embeddings)
 vector_store.add_documents(all_splits)
 
-# 5. 定义RAG提示词
+# 5. 定义RAG提示词 https://smith.langchain.com/hub
 from langchain import hub
 prompt = hub.pull("rlm/rag-prompt")
 

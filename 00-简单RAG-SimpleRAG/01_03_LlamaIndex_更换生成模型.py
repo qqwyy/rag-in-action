@@ -1,6 +1,6 @@
-# 导入相关的库
+# 导入相关的库 pip install llama-index-embeddings-huggingface llama-index-llms-deepseek
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding # 需要pip install llama-index-embeddings-huggingface
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding # 需要 pip install llama-index-embeddings-huggingface
 from llama_index.llms.deepseek import DeepSeek  # 需要pip install llama-index-llms-deepseek
 
 from llama_index.core import Settings # 可以看看有哪些Setting

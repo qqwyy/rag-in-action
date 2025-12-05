@@ -15,7 +15,7 @@ custom_api_key      = os.getenv("OPENAI_API_KEY")
 # (可选) 确认你的第三方 API 支持并需要使用的模型名称
 
 # OpenAI 默认模型:
-llm_model_name       = "gpt-3.5-turbo-0613" # 或者你的 API 支持的其他聊天模型
+llm_model_name       = "gpt-3.5-turbo-0125" # 或者你的 API 支持的其他聊天模型
 embedding_model_name = "text-embedding-3-small" # 或者你的 API 支持的其他嵌入模型
 
 
