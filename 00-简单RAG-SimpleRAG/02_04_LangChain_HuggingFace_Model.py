@@ -50,8 +50,8 @@ from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 import torch
 
-# 加载模型和分词器
-model_name = "Qwen/Qwen2.5-1.5B"
+# 加载模型和分词器 Qwen/Qwen2.5-1.5B  换一个小的模型  Qwen/Qwen2.5-0.5B  953M左右
+model_name = "Qwen/Qwen2.5-0.5B"
 tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(model_name, 
                                              trust_remote_code=True, 

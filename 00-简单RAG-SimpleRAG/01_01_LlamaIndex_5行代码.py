@@ -3,6 +3,7 @@ pip install python-dotenv -i https://pypi.tuna.tsinghua.edu.cn/simple/
 注意：运行此代码前，请确保已在环境变量中设置OpenAI API密钥。 
 在Linux/Mac系统中，可以通过以下命令设置： export OPENAI_API_KEY='sk-proxxxxxx'
 在Windows  系统中，可以通过以下命令设置： set OPENAI_API_KEY=your-api-key
+
 """
 # os.environ["TOKENIZERS_PARALLELISM"] = "false"
 

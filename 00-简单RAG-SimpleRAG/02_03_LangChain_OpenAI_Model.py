@@ -1,7 +1,16 @@
 # 1. 加载文档
+import os
 from langchain_community.document_loaders import WebBaseLoader
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
+
 loader = WebBaseLoader(
-    web_paths=("https://zh.wikipedia.org/wiki/黑神话：悟空",)
+     web_paths=("https://zh.wikipedia.org/wiki/黑神话：悟空",)
+    ,requests_kwargs={
+        "headers": {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+    }
 )
 docs = loader.load()
 
@@ -12,7 +21,10 @@ all_splits = text_splitter.split_documents(docs)
 
 # 3. 设置嵌入模型
 from langchain_openai import OpenAIEmbeddings # pip install langchain-openai
-embeddings = OpenAIEmbeddings()
+embeddings = OpenAIEmbeddings(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    model="text-embedding-3-small"
+)
 
 # 4. 创建向量存储
 from langchain_core.vectorstores import InMemoryVectorStore
