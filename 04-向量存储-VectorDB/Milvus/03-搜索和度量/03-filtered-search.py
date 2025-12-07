@@ -1,4 +1,5 @@
 #官方文档：https://milvus.io/docs/v2.5.x/filtered-search.md
+#表达式：https://milvus.io/docs/v2.5.x/boolean.md
 from dotenv import load_dotenv
 load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
 import os

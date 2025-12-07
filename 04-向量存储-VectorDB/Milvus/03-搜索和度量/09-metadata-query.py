@@ -1,9 +1,17 @@
+#官方文档：https://milvus.io/docs/v2.5.x/keyword-match.md
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
+import os
 from pymilvus import MilvusClient, DataType
 import random
 
 # 1. 设置 Milvus 客户端
-client = MilvusClient(uri="http://localhost:19530")
-COLLECTION_NAME = "ann_search_demo"
+client = MilvusClient(
+    uri     = os.getenv("MILVUS_URL"),
+    db_name = os.getenv("MILVUS_TEST_DB1")
+)
+
+COLLECTION_NAME = "search09_ann_demo"
 
 # 如果集合已存在，则删除
 if client.has_collection(COLLECTION_NAME):
@@ -125,7 +133,11 @@ print("\n=== QueryIterator 分页查询 ===")
 from pymilvus import connections, Collection
 
 # 重新连接以使用 Collection 类
-connections.connect(uri="http://localhost:19530")
+connections.connect(
+    uri= os.getenv("MILVUS_URL"),
+    db_name = os.getenv("MILVUS_TEST_DB1")
+)
+
 collection = Collection(COLLECTION_NAME)
 
 iterator = collection.query_iterator(

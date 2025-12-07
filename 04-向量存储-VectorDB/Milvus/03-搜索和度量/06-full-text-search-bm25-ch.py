@@ -1,9 +1,17 @@
+#官方文档：https://milvus.io/docs/v2.5.x/full-text-search.md
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
+import os
 from pymilvus import MilvusClient, DataType, Function, FunctionType
 import json
 
 # 1. 设置 Milvus 客户端
-client = MilvusClient(uri="http://localhost:19530")
-COLLECTION_NAME = "full_text_search_demo"
+client = MilvusClient(
+    uri     = os.getenv("MILVUS_URL"),
+    db_name = os.getenv("MILVUS_TEST_DB1")
+)
+
+COLLECTION_NAME = "search06_01_full_text_demo"
 
 # 如果集合已存在，则删除
 if client.has_collection(COLLECTION_NAME):
@@ -15,8 +23,8 @@ print("\n创建 schema...")
 schema = client.create_schema()
 
 # 添加必要的字段
-schema.add_field(field_name="id", datatype=DataType.INT64, is_primary=True, auto_id=True)
-schema.add_field(field_name="text", datatype=DataType.VARCHAR, max_length=1000, enable_analyzer=True)
+schema.add_field(field_name="id",     datatype=DataType.INT64,   is_primary=True, auto_id=True)
+schema.add_field(field_name="text",   datatype=DataType.VARCHAR, max_length=1000, enable_analyzer=True)
 schema.add_field(field_name="sparse", datatype=DataType.SPARSE_FLOAT_VECTOR)
 
 # 3. 定义 BM25 函数

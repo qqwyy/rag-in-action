@@ -31,6 +31,8 @@ docker compose down -v
 Milvus GitHub：https://github.com/milvus-io/milvus
 
 
+
+文档：https://github.com/zilliztech/attu?tab=readme-ov-file
 管理后端：attu  Attu GitHub: https://github.com/zilliztech/attu
 # 创建工作目录  
 mkdir milvus-attu && cd milvus-attu

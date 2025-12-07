@@ -1,0 +1,59 @@
+'''
+# 安装Milvus服务端 db版本
+
+# 创建工作目录
+mkdir milvus && cd milvus
+
+wget https://github.com/milvus-io/milvus/releases/download/v2.5.19/milvus-standalone-docker-compose.yml -O docker-compose.yml
+
+sudo docker compose up -d
+
+Creating milvus-etcd  ... done
+Creating milvus-minio ... done
+Creating milvus-standalone ... done
+
+验证运行状态：
+docker compose ps
+
+停止容器：
+docker compose down
+
+如需清除数据（谨慎操作）：
+docker compose down -v
+
+
+
+官方安装指南：https://milvus.io/docs/install_standalone-docker.md
+Milvus GitHub：https://github.com/milvus-io/milvus
+
+
+
+文档：https://github.com/zilliztech/attu?tab=readme-ov-file
+管理后端：attu  Attu GitHub: https://github.com/zilliztech/attu
+# 创建工作目录  
+mkdir milvus-attu && cd milvus-attu
+
+启动：
+docker run -d \
+  --name attu \
+  -p 3000:3000 \
+  -e MILVUS_URL=host.docker.internal:19530 \
+  zilliz/attu:v2.4.8
+
+停止：docker stop attu
+重启：docker start attu
+
+停止并彻底删除容器（谨慎操作）：
+docker stop attu && docker rm attu
+
+
+# 查看正在运行的容器（应看不到 attu）
+docker ps
+# 查看所有容器（包括已停止的，确认是否还存在）
+docker ps -a | grep attu
+
+
+注：在 Mac 上使用 docker run 单独启动 Attu 时，必须使用 host.docker.internal，而不是 localhost 或 127.0.0.1。
+UI 界面连接 也要使用   host.docker.internal：19530
+
+'''
