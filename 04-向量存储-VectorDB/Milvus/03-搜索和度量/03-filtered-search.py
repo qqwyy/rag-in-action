@@ -1,9 +1,17 @@
+#官方文档：https://milvus.io/docs/v2.5.x/filtered-search.md
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
+import os
 from pymilvus import MilvusClient, DataType
 import random
 
 # 1. 设置 Milvus 客户端
-client = MilvusClient(uri="http://localhost:19530")
-COLLECTION_NAME = "ann_search_demo"
+client = MilvusClient(
+    uri     = os.getenv("MILVUS_URL"),
+    db_name = os.getenv("MILVUS_TEST_DB1")
+)
+
+COLLECTION_NAME = "search03_ann_demo"
 
 # 如果集合已存在，则删除
 if client.has_collection(COLLECTION_NAME):
@@ -11,20 +19,20 @@ if client.has_collection(COLLECTION_NAME):
 
 # 2. 创建 schema
 schema = MilvusClient.create_schema(auto_id=False, enable_dynamic_field=True)
-schema.add_field(field_name="id", datatype=DataType.INT64, is_primary=True)
+schema.add_field(field_name="id",     datatype=DataType.INT64,        is_primary=True)
 schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=128)
-schema.add_field(field_name="color", datatype=DataType.VARCHAR, max_length=100)
-schema.add_field(field_name="likes", datatype=DataType.INT64)
+schema.add_field(field_name="color",  datatype=DataType.VARCHAR,      max_length=100)
+schema.add_field(field_name="likes",  datatype=DataType.INT64)
 
 # 3. 创建集合
 client.create_collection(collection_name=COLLECTION_NAME, schema=schema)
 
 # 4. 插入随机向量数据
 num_vectors = 1000
-vectors = [[random.random() for _ in range(128)] for _ in range(num_vectors)]
-ids = list(range(num_vectors))
-colors = [f"color_{random.randint(1, 1000)}" for _ in range(num_vectors)]
-likes = [random.randint(1, 1000) for _ in range(num_vectors)]
+vectors  = [[random.random() for _ in range(128)] for _ in range(num_vectors)]
+ids      = list(range(num_vectors))
+colors   = [f"color_{random.randint(1, 1000)}" for _ in range(num_vectors)]
+likes    = [random.randint(1, 1000) for _ in range(num_vectors)]
 entities = [{"id": ids[i], "vector": vectors[i], "color": colors[i], "likes": likes[i]} for i in range(num_vectors)]
 
 client.insert(collection_name=COLLECTION_NAME, data=entities)
@@ -74,7 +82,7 @@ results = client.search(
     limit=3,
     search_params={
         "metric_type": "L2",
-        "hints": "iterative_filter"  # 启用迭代过滤
+        "hints": "iterative_filter"  # 启用“迭代过滤”模式：先执行 ANN 向量搜索，再对结果应用 filter 表达式；如果结果不足 limit，可能自动扩大搜索范围重试
     },
     filter='color like "color_%" and likes > 500',
     output_fields=["color", "likes"]

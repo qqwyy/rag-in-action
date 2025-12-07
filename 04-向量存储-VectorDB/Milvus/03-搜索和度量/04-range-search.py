@@ -1,9 +1,17 @@
+#官方文档：https://milvus.io/docs/v2.5.x/range-search.md
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
+import os
 from pymilvus import MilvusClient, DataType
 import random
 
 # 1. 设置 Milvus 客户端
-client = MilvusClient(uri="http://localhost:19530")
-COLLECTION_NAME = "ann_search_demo"
+client = MilvusClient(
+    uri     = os.getenv("MILVUS_URL"),
+    db_name = os.getenv("MILVUS_TEST_DB1")
+)
+
+COLLECTION_NAME = "search04_ann_demo"
 
 # 如果集合已存在，则删除
 if client.has_collection(COLLECTION_NAME):
@@ -11,19 +19,19 @@ if client.has_collection(COLLECTION_NAME):
 
 # 2. 创建 schema
 schema = MilvusClient.create_schema(auto_id=False, enable_dynamic_field=True)
-schema.add_field(field_name="id", datatype=DataType.INT64, is_primary=True)
-schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=128)
-schema.add_field(field_name="color", datatype=DataType.VARCHAR, max_length=100)
+schema.add_field(field_name="id",     datatype=DataType.INT64,        is_primary=True)
+schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=128        )
+schema.add_field(field_name="color",  datatype=DataType.VARCHAR,      max_length=100 )
 
 # 3. 创建集合
 client.create_collection(collection_name=COLLECTION_NAME, schema=schema)
 
 # 4. 插入随机向量数据
 num_vectors = 1000
-vectors = [[random.random() for _ in range(128)] for _ in range(num_vectors)]
-ids = list(range(num_vectors))
-colors = [f"color_{random.randint(1, 1000)}" for _ in range(num_vectors)]
-entities = [{"id": ids[i], "vector": vectors[i], "color": colors[i]} for i in range(num_vectors)]
+vectors     = [[random.random() for _ in range(128)] for _ in range(num_vectors)]
+ids         = list(range(num_vectors))
+colors      = [f"color_{random.randint(1, 1000)}" for _ in range(num_vectors)]
+entities    = [{"id": ids[i], "vector": vectors[i], "color": colors[i]} for i in range(num_vectors)]
 
 client.insert(collection_name=COLLECTION_NAME, data=entities)
 
@@ -106,15 +114,15 @@ results = client.search(
     search_params={
         "metric_type": "L2",
         "params": {
-            "radius": 1.0,  # 外圈半径
-            "range_filter": 0.5  # 内圈半径
+            "radius": 15,       # 外圈半径  查找与查询向量距离在 [range_filter, radius) 区间内的所有向量
+            "range_filter": 0.2  # 内圈半径  查找与查询向量距离在 [range_filter, radius) 区间内的所有向量
         }
     },
     output_fields=["color"]
 )
 
 print("范围搜索结果:")
-print(f"搜索范围: 距离在 {0.5} 到 {1.0} 之间的向量")
+print(f"搜索范围: 距离在 [{0.2} 到 {15}) 之间的向量")
 for hits in results:
     for hit in hits:
         print(f"ID: {hit['id']}, 距离: {hit['distance']}, 颜色: {hit['entity']['color']}")

@@ -1,9 +1,17 @@
+#官方文档：https://milvus.io/docs/v2.5.x/grouping-search.md
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
+import os
 from pymilvus import MilvusClient, DataType
 import random
 
 # 1. 设置 Milvus 客户端
-client = MilvusClient(uri="http://localhost:19530")
-COLLECTION_NAME = "group_search_demo"
+client = MilvusClient(
+    uri     = os.getenv("MILVUS_URL"),
+    db_name = os.getenv("MILVUS_TEST_DB1")
+)
+
+COLLECTION_NAME = "search05_group_demo"
 
 # 如果集合已存在，则删除
 if client.has_collection(COLLECTION_NAME):
@@ -11,10 +19,10 @@ if client.has_collection(COLLECTION_NAME):
 
 # 2. 创建 schema
 schema = MilvusClient.create_schema(auto_id=False, enable_dynamic_field=True)
-schema.add_field(field_name="id", datatype=DataType.INT64, is_primary=True)
-schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=128)
-schema.add_field(field_name="docId", datatype=DataType.INT64)
-schema.add_field(field_name="chunk", datatype=DataType.VARCHAR, max_length=100)
+schema.add_field(field_name="id",     datatype=DataType.INT64,        is_primary=True)
+schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=128        )
+schema.add_field(field_name="docId",  datatype=DataType.INT64                        )
+schema.add_field(field_name="chunk",  datatype=DataType.VARCHAR,      max_length=100 )
 
 # 3. 创建集合
 client.create_collection(collection_name=COLLECTION_NAME, schema=schema)
@@ -72,7 +80,7 @@ results = client.search(
     anns_field="vector",
     limit=3,  # 返回3个不同的文档组
     group_by_field="docId",
-    group_size=2,  # 每个组返回2个最相似的结果
+    group_size=2,            # 每个组返回2个最相似的结果
     strict_group_size=True,  # 严格确保每个组有2个结果
     output_fields=["docId", "chunk"]
 )

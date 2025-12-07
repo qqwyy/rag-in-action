@@ -1,4 +1,7 @@
-#官方文档 https://milvus.io/docs/v2.5.x/single-vector-search.md
+#官方文档：https://milvus.io/docs/v2.5.x/single-vector-search.md
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
+import os
 from pymilvus import MilvusClient, DataType
 import random
 import numpy as np
@@ -10,17 +13,21 @@ COSINE 适合方向相似性比较
 '''
 
 # 1. 设置 Milvus 客户端
-client = MilvusClient(uri="http://localhost:19530")
+client = MilvusClient(
+    uri     = os.getenv("MILVUS_URL"),
+    db_name = os.getenv("MILVUS_TEST_DB1")
+)
 
 # 定义指标类型和对应的集合名称
 metric_types = ["L2", "IP", "COSINE"]
-collections = {metric: f"ann_search_demo_{metric.lower()}" for metric in metric_types}
+collections = {metric: f"search02_ann_demo_{metric.lower()}" for metric in metric_types}
+print(f"准备集合列表名称： {collections} ")
 
 # 2. 创建数据
 def create_data(num_vectors=1000, dim=128):
     vectors = [[random.random() for _ in range(dim)] for _ in range(num_vectors)]
-    ids = list(range(num_vectors))
-    colors = [f"color_{random.randint(1, 1000)}" for _ in range(num_vectors)]
+    ids     = list(range(num_vectors))
+    colors  = [f"color_{random.randint(1, 1000)}" for _ in range(num_vectors)]
     return vectors, ids, colors
 
 vectors, ids, colors = create_data()
@@ -33,9 +40,9 @@ def create_collection_with_metric(collection_name, metric_type):
 
     # 创建 schema
     schema = MilvusClient.create_schema(auto_id=False, enable_dynamic_field=True)
-    schema.add_field(field_name="id", datatype=DataType.INT64, is_primary=True)
+    schema.add_field(field_name="id"    , datatype=DataType.INT64,        is_primary=True)
     schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=128)
-    schema.add_field(field_name="color", datatype=DataType.VARCHAR, max_length=100)
+    schema.add_field(field_name="color" , datatype=DataType.VARCHAR,      max_length=100)
 
     # 创建集合
     client.create_collection(collection_name=collection_name, schema=schema)
@@ -64,7 +71,7 @@ def create_collection_with_metric(collection_name, metric_type):
 
 # 为每种指标类型创建集合
 for metric_type, collection_name in collections.items():
-    print(f"\n创建 {metric_type} 指标类型的集合...")
+    print(f"\n创建集合：{collection_name} 含metric： {metric_type} 指标类型的集合...")
     create_collection_with_metric(collection_name, metric_type)
 
 # 4. 生成查询向量
