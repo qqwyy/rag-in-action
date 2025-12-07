@@ -1,6 +1,7 @@
 version: '3.5'
 #文档地址：https://github.com/milvus-io/milvus/releases/download/v2.5.19/milvus-standalone-docker-compose.yml
 
+
 services:
   etcd:
     container_name: milvus-etcd
