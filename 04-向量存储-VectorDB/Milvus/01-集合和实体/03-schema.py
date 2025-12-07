@@ -1,17 +1,22 @@
 # 安装依赖：pip install pymilvus
 from pymilvus import MilvusClient, DataType
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
+import os
 
 # ——————————————
 # 0. 连接 Milvus
 # ——————————————
 client = MilvusClient(
-    uri="http://localhost:19530",
+    uri=os.getenv("MILVUS_URL"),
     token="root:Milvus"
 )
 print("✓ 已连接 Milvus接口")
 
 # ——————————————
 # 1. 创建基本 Schema
+# api文档：https://milvus.io/api-reference/pymilvus/v2.5.x/MilvusClient/CollectionSchema/CollectionSchema.md
+# api文档：https://milvus.io/api-reference/pymilvus/v2.5.x/MilvusClient/CollectionSchema/add_field.md
 # ——————————————
 schema = MilvusClient.create_schema()
 print("✓ 已创建空 Schema")
@@ -112,7 +117,18 @@ print("✓ 已添加动态字段")
 # ——————————————
 # 6. 使用Schema创建Collection
 # ——————————————
+wyydb1 = "oldwang_database_1"
+client.use_database(db_name=wyydb1)
+print(f"✓ 已切换当前数据库为 {wyydb1}")
+
+
 collection_name = "document_store10"
+
+if collection_name in client.list_collections():
+    client.drop_collection(collection_name=collection_name)
+    print(f"✓ 已删除已存在的集合 {collection_name}")
+
+
 client.create_collection(
     collection_name=collection_name,
     schema=schema
@@ -136,7 +152,7 @@ print(f"✓ 已创建集合 {collection_name}")
 # 8. 查看Collection详情
 # ——————————————
 info = client.describe_collection(collection_name=collection_name)
-print("Collection详情：", info)
+print(f"集合{collection_name}详情：", info)
 
 # ——————————————
 # 9. 清理

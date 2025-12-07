@@ -1,18 +1,28 @@
 # 安装依赖：pip install pymilvus
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
+import os
 from pymilvus import MilvusClient
 
 # ——————————————
 # 0. 连接 Milvus
 # ——————————————
 client = MilvusClient(
-    uri="http://localhost:19530",
+    uri=os.getenv("MILVUS_URL"),
     token="root:Milvus"
 )
 print("✓ 已连接 Milvus接口")
 
 # ——————————————
-# 1. 创建 Collection（快速模式）
+# 1. 创建 Collection（快速模式）  api 文档：https://milvus.io/api-reference/pymilvus/v2.5.x/MilvusClient/Collections/create_collection.md
 # ——————————————
+
+wyydb1 = "oldwang_database_1"
+
+client.use_database(db_name=wyydb1)
+print(f"✓ 已切换当前数据库为 {wyydb1}")
+
+
 # 检查并删除已存在的集合
 collection_name = "quick_setup"
 if collection_name in client.list_collections():
@@ -36,12 +46,14 @@ print("当前所有集合：", cols)
 # 3. 查看 Collection 详情
 # ——————————————
 info = client.describe_collection(collection_name=collection_name)
-print(f"{collection_name} 详情：", info)
+print(f"集合：{collection_name} 详情：", info)
 
 # ——————————————
-# 4. 重命名 Collection
+# 4. 重命名 Collection    注：需先清理 alias
 # ——————————————
 new_collection_name = "quick_renamed"
+client.drop_alias(alias="alias3")
+client.drop_alias(alias="alias4")
 if new_collection_name in client.list_collections():
     client.drop_collection(collection_name=new_collection_name)
     print(f"✓ 已删除已存在的集合 {new_collection_name}")
@@ -148,12 +160,14 @@ client.alter_alias(collection_name=new_collection_name, alias="alias4")
 print("✓ 已将 alias4 重新分配给 quick_renamed")
 
 # 10.5 删除 Alias
-client.drop_alias(alias="alias3")
-print("✓ 已删除 alias3")
+client.drop_alias(alias="alias4")
+print("✓ 已删除 alias4")
 print("剩余 aliases：", client.list_aliases(new_collection_name))
 
 # ——————————————
-# 11. 删除 Collection
+# 11. 删除 Collection  注：需先清理 alias
 # ——————————————
+client.drop_alias(alias="alias3")
+client.drop_alias(alias="alias4")
 client.drop_collection(collection_name=new_collection_name)
 print(f"✓ 集合 {new_collection_name} 已删除")

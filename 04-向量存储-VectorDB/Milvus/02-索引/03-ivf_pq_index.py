@@ -1,9 +1,16 @@
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
+import os
 from pymilvus import MilvusClient, DataType
 import random
 
 # 1. 设置 Milvus 客户端
-client = MilvusClient(uri="http://localhost:19530")
-COLLECTION_NAME = "flat_index_demo"
+client = MilvusClient(
+    uri = os.getenv("MILVUS_URL"),
+    db_name = os.getenv("MILVUS_TEST_DB")
+    )
+
+COLLECTION_NAME = "index_ivf_pq_demo"
 
 # 如果集合已存在，则删除
 if client.has_collection(COLLECTION_NAME):
@@ -11,8 +18,8 @@ if client.has_collection(COLLECTION_NAME):
 
 # 2. 创建 schema
 schema = MilvusClient.create_schema(auto_id=False, enable_dynamic_field=True)
-schema.add_field(field_name="id", datatype=DataType.INT64, is_primary=True)
-schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=128)
+schema.add_field(field_name="id"    , datatype=DataType.INT64       , is_primary=True)
+schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=128        )
 
 # 3. 创建集合
 client.create_collection(collection_name=COLLECTION_NAME, schema=schema)
@@ -36,7 +43,7 @@ index_params.add_index(
     index_name="vector_index",
     params={
         "nlist": 64,  # 聚类中心数量，通常设置为 4*sqrt(n)，n 为向量数量
-        "m": 32,      # 向量被分割的子向量数量，通常为 dim/m >= 2，这里 128/32=4
+        "m"    : 32,  # 向量被分割的子向量数量，通常为 dim/m >= 2，这里 128/32=4
         "nbits": 8    # 每个子向量的编码位数，通常为 8 位
     }
 )
@@ -47,11 +54,8 @@ client.create_index(
 )
 
 # 验证索引
-print("索引列表:", client.list_indexes(collection_name=COLLECTION_NAME))
-print("索引详情:", client.describe_index(
-    collection_name=COLLECTION_NAME,
-    index_name="vector_index"
-))
+print("索引列表:", client.list_indexes  (collection_name=COLLECTION_NAME))
+print("索引详情:", client.describe_index(collection_name=COLLECTION_NAME,index_name="vector_index"))
 
 # 6. load 后再搜索
 client.load_collection(collection_name=COLLECTION_NAME)
