@@ -1,5 +1,4 @@
 # api文档：https://milvus.io/docs/v2.5.x/insert-update-delete.md
-# milvus ：https://milvus.io/docs/insert-update-delete.md
 from dotenv import load_dotenv
 load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
 import os

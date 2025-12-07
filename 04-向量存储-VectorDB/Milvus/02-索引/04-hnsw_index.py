@@ -1,3 +1,4 @@
+# 官方文档：https://milvus.io/docs/v2.5.x/index-explained.md
 from dotenv import load_dotenv
 load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
 import os
@@ -7,10 +8,10 @@ import random
 # 1. 设置 Milvus 客户端
 client = MilvusClient(
     uri = os.getenv("MILVUS_URL"),
-    db_name = os.getenv("MILVUS_TEST_DB")
+    db_name = os.getenv("MILVUS_TEST_DB1")
     )
 
-COLLECTION_NAME = "index_hnsw_demo"
+COLLECTION_NAME = "index04_hnsw_demo"
 
 # 如果集合已存在，则删除
 if client.has_collection  (COLLECTION_NAME):
