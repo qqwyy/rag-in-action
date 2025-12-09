@@ -1,13 +1,11 @@
 # 1. 加载文档
 import os
-from dotenv import load_dotenv
-# 加载环境变量
-load_dotenv()
-
 from langchain_community.document_loaders import WebBaseLoader
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
 
 loader = WebBaseLoader(
-    web_paths=("https://zh.wikipedia.org/wiki/黑神话：悟空",)
+     web_paths=("https://zh.wikipedia.org/wiki/黑神话：悟空",)
     ,requests_kwargs={
         "headers": {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -18,29 +16,19 @@ docs = loader.load()
 
 # 2. 文档分块
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 all_splits = text_splitter.split_documents(docs)
 
-for split,i in all_splits:
-    print(f"分片{i+1}: 内容：{split}")
-
 # 3. 设置嵌入模型
-from langchain_huggingface import HuggingFaceEmbeddings
-#bge-large-zh-v1.5 bge-small-zh-v1.5
-os.environ["HF_HUB_OFFLINE"] = "1" #完全禁止访问网络
-embeddings = HuggingFaceEmbeddings(
-    model_name="BAAI/bge-small-zh-v1.5",
-    model_kwargs={'device': 'cpu'},
-    encode_kwargs={'normalize_embeddings': True}
+from langchain_openai import OpenAIEmbeddings # pip install langchain-openai
+embeddings = OpenAIEmbeddings(
+    model=os.getenv("EMBEDDING_API_MODEL") ,   # 与服务端 model 字段一致
+    api_key=os.getenv("EMBEDDING_API_KEY") ,     # api key
+    openai_api_base=os.getenv("EMBEDDING_API_BASE")      # 你的 BGE 服务地址
 )
-
-user_home = os.path.expanduser("~")
-print(f"用户目录：{user_home}")
 
 # 4. 创建向量存储
 from langchain_core.vectorstores import InMemoryVectorStore
-
 vector_store = InMemoryVectorStore(embeddings)
 vector_store.add_documents(all_splits)
 
@@ -53,7 +41,6 @@ docs_content = "\n\n".join(doc.page_content for doc in retrieved_docs)
 
 # 7. 构建提示模板
 from langchain_core.prompts import ChatPromptTemplate
-
 prompt = ChatPromptTemplate.from_template("""
                 基于以下上下文，回答问题。如果上下文中没有相关信息，
                 请说"我无法从提供的上下文中找到相关信息"。
@@ -64,19 +51,8 @@ prompt = ChatPromptTemplate.from_template("""
 
 # 8. 使用大语言模型生成答案
 from langchain_openai import ChatOpenAI
-
-
-llm = ChatOpenAI(
-    model=os.getenv("DEEPSEEK_API_MODEL"),  # DeepSeek API 支持的模型名称
-    base_url=os.getenv("DEEPSEEK_API_BASE"), # 从环境变量加载API 请求地址
-    temperature=0.7,        # 控制输出的随机性(0-1之间,越大越随机)
-    max_tokens=2048,        # 最大输出长度
-    top_p=0.95,            # 控制输出的多样性(0-1之间)
-    presence_penalty=0.0,   # 重复惩罚系数(-2.0到2.0之间)
-    frequency_penalty=0.0,  # 频率惩罚系数(-2.0到2.0之间)
-    api_key=os.getenv("DEEPSEEK_API_KEY")  # 从环境变量加载API key
-)
+llm = ChatOpenAI(model="gpt-3.5-turbo")
 answer = llm.invoke(prompt.format(question=question, context=docs_content))
-print(answer)
+print(answer.content)
 
 
