@@ -1,3 +1,8 @@
+# pip install rank-bm25 有现场的第三方库  
+
+# 以下为：对一组中文“战斗日志”文本，手动计算每个日志的 BM25 稀疏向量表示（即每个词在该日志中的 BM25 权重），
+# 用于后续的关键词检索或稀疏向量检索（如 Milvus 的 SPARSE_FLOAT_VECTOR）。
+
 from collections import Counter
 import math
 # 猢狲的战斗日志
@@ -32,4 +37,4 @@ def bm25_sparse_embedding(log):
 # 生成稀疏向量
 for log in battle_logs:
     sparse_embedding = bm25_sparse_embedding(log)
-print(f"稀疏嵌入： {sparse_embedding}")
+print(f"稀疏嵌入： {sparse_embedding}\r\n")
