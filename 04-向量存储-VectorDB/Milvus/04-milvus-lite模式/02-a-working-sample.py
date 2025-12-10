@@ -1,6 +1,7 @@
 # todo
 # 准备示例数据集
 import pandas as pd
+import os
 data_records = [
     {
         "monster_id": "BM001",
@@ -22,27 +23,33 @@ df = pd.DataFrame(data_records)
 
 # 建立/连接Milvus
 from pymilvus import MilvusClient, DataType, FieldSchema, CollectionSchema
-from pymilvus import model
-db_path = "./wukong.db"
+from pymilvus import model  #pip install "pymilvus[model]"
+#这正是 Milvus Lite（轻量版）  注意：目前尚不支持 Windows 系统。
+db_path = "./wukong.db"    
 client = MilvusClient(db_path)
-collection_name = "Wukong_Monsters"
+collection_name = "Wukong02_Monsters"
 
 # 获取嵌入模型的向量维度
-from pymilvus.model.dense import SentenceTransformerEmbeddingFunction 
-embedding_function = SentenceTransformerEmbeddingFunction(model_name='BAAI/bge-large-zh')
+# SentenceTransformerEmbeddingFunction 是一个包装器（wrapper），
+# 底层基于 Sentence-Transformers 库（由 UKP Lab 开发），用于将文本编码为稠密向量。
+os.environ["HF_HUB_OFFLINE"] = "1" #完全禁止访问网络  此前已下载到本地
+# from pymilvus.model.dense import SentenceTransformerEmbeddingFunction
+#bge-large-zh 替换为  bge-large-zh-v1.5
+#https://milvus.io/docs/zh/embed-with-bgm-m3.md
+embedding_function = model.dense.SentenceTransformerEmbeddingFunction(model_name='BAAI/bge-small-zh-v1.5')
 sample_embedding = embedding_function(["示例文本"])[0]
 vector_dim = len(sample_embedding)
 
 # 定义集合模式并创建集合
 fields = [
-    FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
-    FieldSchema(name="vector", dtype=DataType.FLOAT_VECTOR, dim=vector_dim),
-    FieldSchema(name="monster_id", dtype=DataType.VARCHAR, max_length=50),
+    FieldSchema(name="id",           dtype=DataType.INT64,        is_primary=True, auto_id=True),
+    FieldSchema(name="vector",       dtype=DataType.FLOAT_VECTOR, dim=vector_dim),
+    FieldSchema(name="monster_id",   dtype=DataType.VARCHAR, max_length=50),
     FieldSchema(name="monster_name", dtype=DataType.VARCHAR, max_length=100),
-    FieldSchema(name="location", dtype=DataType.VARCHAR, max_length=100),
-    FieldSchema(name="difficulty", dtype=DataType.VARCHAR, max_length=20),
-    FieldSchema(name="synonyms", dtype=DataType.VARCHAR, max_length=200),
-    FieldSchema(name="description", dtype=DataType.VARCHAR, max_length=500),
+    FieldSchema(name="location",     dtype=DataType.VARCHAR, max_length=100),
+    FieldSchema(name="difficulty",   dtype=DataType.VARCHAR, max_length=20),
+    FieldSchema(name="synonyms",     dtype=DataType.VARCHAR, max_length=200),
+    FieldSchema(name="description",  dtype=DataType.VARCHAR, max_length=500),
 ]
 schema = CollectionSchema(fields, description=" Wukong Monsters", enable_dynamic_field=True)
 if not client.has_collection(collection_name):

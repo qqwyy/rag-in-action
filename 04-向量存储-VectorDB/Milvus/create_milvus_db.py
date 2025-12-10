@@ -1,12 +1,15 @@
 # todo
+import pandas  as pd
+import logging
+import torch    
 from pymilvus import model
 from pymilvus import MilvusClient
-import pandas as pd
+
 from tqdm import tqdm
-import logging
+
 from dotenv import load_dotenv
 load_dotenv()
-import torch    
+
 from pymilvus import MilvusClient, DataType, FieldSchema, CollectionSchema
 
 # 设置日志
