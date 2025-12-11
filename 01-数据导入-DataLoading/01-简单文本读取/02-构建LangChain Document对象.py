@@ -9,5 +9,6 @@ documents = [
         metadata={"source": "师徒四人.txt "},
     ),
 ]
-print(documents)
+
+print(f"内容预览：{documents}")
 
