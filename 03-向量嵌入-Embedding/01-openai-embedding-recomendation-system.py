@@ -5,6 +5,9 @@ import numpy as np
 import json
 from sklearn.metrics.pairwise import cosine_similarity
 
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件中的环境变量     OPENAI_API_BASE=https:xxxx  OPENAI_API_KEY=xxxx
+
 # 读取用户评价数据集
 df = pd.read_csv("90-文档-Data/灭神纪/用户评价.csv")
 
@@ -13,6 +16,11 @@ with open("90-文档-Data/灭神纪/游戏说明.json", "r") as f:
     game_descriptions = json.load(f)
 
 # 定义函数获取嵌入向量
+# 设置 API Key
+openai.api_key = os.getenv("OPENAI_API_KEY")
+# 设置 Base URL（例如通过代理、或兼容 OpenAI 协议的服务）
+openai.base_url = os.getenv("OPENAI_API_BASE")+"/"
+
 def get_embedding(text, model="text-embedding-3-small"):
     response = openai.embeddings.create(
         input=[text],
